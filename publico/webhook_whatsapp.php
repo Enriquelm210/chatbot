@@ -11,18 +11,30 @@ if ($metodo === 'GET') {
     $token = $_GET['hub_verify_token'] ?? $_GET['hub.verify_token'] ?? '';
     $challenge = $_GET['hub_challenge'] ?? $_GET['hub.challenge'] ?? '';
 
-    if ($modo === 'subscribe' && hash_equals((string) entorno('WHATSAPP_TOKEN_VERIFICACION', ''), (string) $token)) {
+    registrarBitacora('Verificacion webhook GET', [
+        'query_string' => $_SERVER['QUERY_STRING'] ?? '',
+        'modo' => $modo,
+        'token_recibido' => $token,
+        'token_esperado' => (string) entorno('WHATSAPP_TOKEN_VERIFICACION', ''),
+        'challenge' => $challenge,
+    ]);
+
+    if ($modo === 'subscribe' && trim((string) entorno('WHATSAPP_TOKEN_VERIFICACION', '')) === trim((string) $token)) {
         responderTexto((string) $challenge);
+        exit;
     }
 
-    responderTexto('Token de verificación inválido.', 403);
+    responderTexto('Webhook activo');
+    exit;
 }
 
 if ($metodo === 'POST') {
     $entradaCruda = file_get_contents('php://input') ?: '{}';
     $datos = json_decode($entradaCruda, true);
+
     if (!is_array($datos)) {
         responderJson(['ok' => false, 'mensaje' => 'JSON inválido'], 400);
+        exit;
     }
 
     registrarBitacora('Webhook recibido', ['payload' => $datos]);
@@ -31,6 +43,8 @@ if ($metodo === 'POST') {
     $manejador->procesarWebhook($datos);
 
     responderJson(['ok' => true]);
+    exit;
 }
 
 responderJson(['ok' => false, 'mensaje' => 'Método no permitido'], 405);
+exit;
