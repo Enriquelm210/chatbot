@@ -2,40 +2,79 @@
 
 Repositorio: https://github.com/Enriquelm210/chatbot
 
-Este proyecto implementa un chatbot en **PHP + MySQL** para recibir solicitudes de cotización de seguros por WhatsApp. El flujo está pensado para evitar registros falsos, validar datos básicos, pedir foto de la **INE por ambos lados** y mostrar todo en un panel para el personal encargado de seguros.
+Este proyecto implementa un chatbot desarrollado en **PHP + MySQL** que se integra con la **WhatsApp Cloud API** para automatizar la atención de clientes y la recolección de datos para cotización de seguros.
 
-## Funcionalidades principales
+El sistema guía al usuario mediante un flujo conversacional estructurado, validando información y almacenando solicitudes para su posterior revisión en un panel administrativo.
 
-- Menú de cotización por tipo de seguro.
-- Opciones y planes por cada tipo de seguro.
-- Validación de nombre, edad, correo, ciudad y código postal.
-- Campos específicos según el seguro elegido.
-- Solicitud de INE frente y reverso para corroborar información.
-- Descarga y guardado local de imágenes enviadas por WhatsApp Cloud API.
-- Panel administrativo en español para revisar solicitudes, filtros, datos e imágenes.
-- Bitácora simple para revisar errores o payloads del webhook.
+---
 
-## Tipos de seguro incluidos
+## 🚀 Funcionalidades principales
 
-1. Seguro de Auto
+- Menú interactivo por tipo de seguro.
+- Selección de planes o coberturas.
+- Validación de datos del usuario:
+  - Nombre completo
+  - Edad
+  - Correo electrónico
+  - Ciudad o municipio
+  - Código postal
+- Captura de datos específicos según el seguro.
+- Solicitud de INE (frente y reverso).
+- Descarga y almacenamiento local de imágenes.
+- Panel administrativo para gestión de solicitudes.
+- Bitácora para debugging del sistema y webhook.
+
+---
+
+## 🛡️ Tipos de seguro incluidos
+
+1. **Seguro de Auto**
    - Cobertura Básica
    - Cobertura Limitada
    - Cobertura Amplia
-2. Seguro de Vida
+
+2. **Seguro de Vida**
    - Plan Individual
    - Plan Familiar
    - Plan con Ahorro
-3. Seguro de Gastos Médicos
+
+3. **Seguro de Gastos Médicos**
    - Plan Básico
    - Plan Plus
    - Plan Premium
-4. Seguro de Hogar
+
+4. **Seguro de Hogar**
    - Protección Esencial
    - Protección Completa
 
-## Estructura del proyecto
+---
 
-```text
+## 🏗️ Arquitectura del sistema
+
+El sistema actualmente utiliza una arquitectura **monolítica**, donde todos los componentes están integrados en una sola aplicación.
+
+### Componentes principales
+
+- Webhook (entrada desde WhatsApp)
+- Manejador del chatbot (lógica de flujo)
+- Servicio de WhatsApp (envío de mensajes)
+- Repositorio de datos
+- Bitácora de eventos
+- Panel administrativo
+
+### Evolución futura
+
+El sistema está diseñado para poder migrar a **microservicios**, separando:
+
+- Servicio de mensajes
+- Servicio de usuarios
+- Servicio de cotizaciones
+- Servicio de autenticación
+
+---
+
+## 🧱 Estructura del proyecto
+
 chatbot/
 ├── almacen/
 │   ├── ine_frente/
@@ -54,205 +93,148 @@ chatbot/
 │   └── servicio_whatsapp.php
 ├── publico/
 │   ├── administracion.php
-│   ├── cerrar_sesion.php
-│   ├── detalle_solicitud.php
-│   ├── index.php
-│   ├── iniciar_sesion.php
-│   ├── ver_archivo.php
-│   └── webhook_whatsapp.php
+│   ├── webhook_whatsapp.php
+│   └── otros archivos del panel
 ├── sql/
 │   └── base_de_datos.sql
 ├── .env.ejemplo
-├── .gitignore
 └── README.md
-```
 
-## Requisitos
+---
+
+## ⚙️ Requisitos
 
 - PHP 8.1 o superior
-- Extensión `pdo_mysql`
-- Extensión `curl`
 - MySQL o MariaDB
-- XAMPP, Laragon o un entorno local similar
-- Cuenta de Meta Developers con **WhatsApp Cloud API** activa
+- XAMPP o entorno local equivalente
+- Extensión pdo_mysql
+- Extensión curl
+- Cuenta en Meta Developers con WhatsApp Cloud API
 
-## Paso 1. Clonar el repositorio
+---
 
-```bash
+## 🛠️ Instalación
+
+### 1. Clonar repositorio
+
 git clone https://github.com/Enriquelm210/chatbot.git
 cd chatbot
-```
 
-## Paso 2. Crear el archivo `.env`
+---
 
-Duplica el archivo de ejemplo y renómbralo como `.env`.
+### 2. Configurar archivo .env
 
-```bash
-cp .env.ejemplo .env
-```
-
-Si estás en Windows y no te funciona `cp`, crea manualmente un archivo `.env` y copia este contenido base:
-
-```ini
-APP_NOMBRE=Chatbot de Seguros por WhatsApp
+APP_NOMBRE=Chatbot de Seguros
 APP_URL=http://localhost/chatbot/publico
-APP_ZONA_HORARIA=America/Mexico_City
 
 DB_HOST=localhost
-DB_PUERTO=3306
 DB_NOMBRE=chatbot_seguros
 DB_USUARIO=root
 DB_CONTRASENA=
 
-WHATSAPP_TOKEN_VERIFICACION=mi_token_de_verificacion
-WHATSAPP_TOKEN_ACCESO=pega_aqui_tu_token_de_whatsapp_cloud
-WHATSAPP_ID_NUMERO_TELEFONO=123456789012345
-WHATSAPP_VERSION_API=v23.0
+WHATSAPP_TOKEN_VERIFICACION=tu_token_de_verificacion
+WHATSAPP_TOKEN_ACCESO=tu_token_de_whatsapp
+WHATSAPP_ID_NUMERO_TELEFONO=tu_phone_number_id
+WHATSAPP_VERSION_API=v25.0
 
 ADMIN_USUARIO=admin
-ADMIN_CONTRASENA=Seguros2026*
-```
+ADMIN_CONTRASENA=*******
 
-## Paso 3. Crear la base de datos en XAMPP
+---
 
-1. Abre XAMPP.
-2. Inicia **Apache** y **MySQL**.
-3. Entra a `http://localhost/phpmyadmin`.
-4. Ve a **Importar**.
-5. Selecciona el archivo `sql/base_de_datos.sql`.
-6. Ejecuta la importación.
+### 3. Base de datos
 
-Eso creará la base `chatbot_seguros`, las tablas y los catálogos de tipos de seguro y opciones.
+Importar archivo:
+sql/base_de_datos.sql
 
-## Paso 4. Colocar el proyecto en `htdocs`
+---
 
-Copia la carpeta `chatbot` dentro de:
+### 4. Ubicación del proyecto
 
-```text
-C:\xampp\htdocs\
-```
-
-La ruta final debe quedar así:
-
-```text
 C:\xampp\htdocs\chatbot
-```
 
-## Paso 5. Probar en local
+---
 
-Abre en el navegador:
+### 5. Ejecutar servidor
 
-```text
+Iniciar Apache y MySQL en XAMPP
+
+Abrir:
 http://localhost/chatbot/publico
-```
 
-## Paso 6. Entrar al panel administrativo
+---
 
-Abre:
+## 🌐 Configuración de WhatsApp Cloud API
 
-```text
-http://localhost/chatbot/publico/iniciar_sesion.php
-```
+Webhook URL:
+https://TU_URL_NGROK/chatbot/publico/webhook_whatsapp.php
 
-Usuario y contraseña por defecto del `.env`:
+Token de verificación:
+tu_token_de_verificacion
 
-- Usuario: `admin`
-- Contraseña: `Seguros2026*`
+---
 
-Cámbialos antes de usarlo en un entorno real.
+## 🔌 Uso de ngrok
 
-## Paso 7. Configurar WhatsApp Cloud API
+ngrok http 80
 
-Dentro de Meta Developers debes configurar:
+---
 
-- **Token de acceso permanente** o temporal
-- **Phone Number ID** del número que usará el bot
-- **Webhook URL**
-- **Webhook Verify Token**
+## 🔄 Flujo del chatbot
 
-### Valores que debes copiar al `.env`
+1. Usuario envía "hola"
+2. Se muestra menú de seguros
+3. Usuario selecciona opción
+4. Se solicitan datos
+5. Se validan entradas
+6. Se solicitan imágenes de INE
+7. Se guarda la solicitud
+8. Se visualiza en panel administrativo
 
-- `WHATSAPP_TOKEN_ACCESO`
-- `WHATSAPP_ID_NUMERO_TELEFONO`
-- `WHATSAPP_TOKEN_VERIFICACION`
+---
 
-### URL del webhook
+## 🧪 Validaciones implementadas
 
-Si usas XAMPP local, la ruta del webhook será:
+- Nombre completo real
+- Edad válida
+- Correo con formato correcto
+- Código postal válido
+- Validación por tipo de seguro
+- Detección de respuestas falsas o spam
 
-```text
-http://localhost/chatbot/publico/webhook_whatsapp.php
-```
+---
 
-Para probar con Meta, normalmente necesitarás exponer tu servidor local con una herramienta como **ngrok** o subir el proyecto a un hosting.
+## ⚠️ Seguridad
 
-Ejemplo con URL pública:
+Se recomienda:
+- Uso de HTTPS
+- Protección del panel administrativo
+- Manejo seguro de datos personales
+- Implementación de aviso de privacidad
 
-```text
-https://tu-dominio-o-ngrok/chatbot/publico/webhook_whatsapp.php
-```
+---
 
-## Cómo funciona el chatbot
+## 📌 Estado actual
 
-1. El usuario escribe `hola`.
-2. El bot muestra tipos de seguro.
-3. El usuario elige el tipo.
-4. El bot muestra planes o coberturas disponibles.
-5. El usuario selecciona una opción.
-6. El bot solicita datos generales:
-   - nombre completo
-   - edad
-   - correo
-   - ciudad
-   - código postal
-7. El bot pide datos adicionales según el tipo de seguro:
-   - Auto: marca, modelo, año
-   - Vida: beneficiario principal
-   - Gastos médicos: cantidad de asegurados
-   - Hogar: valor estimado de la vivienda
-8. El bot pide foto del frente de la INE.
-9. El bot pide foto del reverso de la INE.
-10. La solicitud queda disponible en el panel administrativo.
+✔ Sistema funcional  
+✔ Integración con WhatsApp activa  
+✔ Webhook configurado correctamente  
+✔ Flujo conversacional completo  
 
-## Validaciones incluidas
+---
 
-El sistema aplica validaciones para evitar datos falsos o que alguien solo juegue con el bot:
+## 🔮 Mejoras futuras
 
-- Nombre completo real, con al menos nombre y apellidos.
-- Edad entre 18 y 85 años.
-- Correo con formato válido.
-- Ciudad con texto real.
-- Código postal de 5 dígitos.
-- Validación específica por tipo de seguro.
-- Detección básica de texto de prueba como `asdf`, `qwerty`, `12345`, `xxx`, etc.
-- La solicitud no se considera completa hasta recibir las dos imágenes de INE.
+- Migración a microservicios
+- Integración con inteligencia artificial
+- Panel más avanzado
+- Base de datos optimizada
+- Manejo de sesiones más robusto
 
-## Seguridad recomendada
+---
 
-Este proyecto guarda información sensible. Antes de usarlo en producción deberías:
+## 👨‍💻 Autor
 
-- Cambiar credenciales del panel.
-- Proteger la carpeta del proyecto con HTTPS.
-- Restringir el acceso al panel administrativo.
-- Cifrar archivos sensibles si vas a manejar datos reales.
-- Agregar aviso de privacidad.
-- Definir política de conservación y eliminación de INE.
-- Implementar control de auditoría y roles si habrá varios agentes.
-
-## Prueba rápida del webhook
-
-Puedes verificar que el archivo responde con el token de validación cuando Meta intente validar el webhook.
-
-## Comandos Git para subir cambios
-
-```bash
-git add .
-git commit -m "feat: chatbot de seguros por WhatsApp en español"
-git push origin main
-```
-
-## Notas finales
-
-- El proyecto está completamente en español, incluyendo nombres de archivos y mensajes del chatbot.
-- No incluye dependencias externas para que sea más fácil levantarlo en XAMPP.
-- Si vas a usar un número real de WhatsApp, recuerda que necesitas configurarlo desde Meta Developers.
+Proyecto académico  
+Ingeniería en Desarrollo y Gestión de Software
+Seguros Informaticos UTC
