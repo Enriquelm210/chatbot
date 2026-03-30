@@ -75,6 +75,7 @@ El sistema está diseñado para poder migrar a **microservicios**, separando:
 
 ## 🧱 Estructura del proyecto
 
+```text
 chatbot/
 ├── almacen/
 │   ├── ine_frente/
@@ -99,8 +100,7 @@ chatbot/
 │   └── base_de_datos.sql
 ├── .env.ejemplo
 └── README.md
-
----
+```
 
 ## ⚙️ Requisitos
 
